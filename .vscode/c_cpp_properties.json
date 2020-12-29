@@ -1,0 +1,30 @@
+{
+    "configurations": [
+        {
+            "name": "ESP8266",
+            "includePath": [
+                "/home/lieven/esp/ESP8266_RTOS_SDK/components/**",
+                "/home/lieven/esp/ESP8266_RTOS_SDK/components/freertos/include/**",
+                "${workspaceFolder}/main",
+                "${workspaceFolder}/components/**",
+                "${workspaceFolder}/../limero/**",
+                "${workspaceFolder}/../Common/",
+                "${workspaceFolder}/../ArduinoJson/src/"
+            ],
+            "defines": [
+                "FREERTOS",
+                "MQTT_HOST=limero.ddns.net",
+                "MQTT_PORT=1883",
+                "ESP8266_RTOS_SDK",
+                "ANCHOR1"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "forcedInclude": [],
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
