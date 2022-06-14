@@ -1,3 +1,4 @@
+#ifdef GENERIC_TREESHAKER
 #include <cstring>
 #include <stdio.h>
 //#include <esp/uart.h>
@@ -6,7 +7,8 @@
 #include <LedBlinker.h>
 #include <Wifi.h>
 #include <MqttWifi.h>
-#define GENERIC
+#include <StringUtility.h>
+#define TREESHAKER 
 //#define DWM1000
 
 /******************************************************************************
@@ -16,7 +18,7 @@
  * Returns      : none
  *******************************************************************************/
 
-Log logger(512);
+Log logger;
 
 void vAssertCalled(unsigned long ulLine, const char *const pcFileName)
 {
@@ -30,39 +32,7 @@ extern "C" void vApplicationMallocFailedHook()
         ;
 }
 
-//______________________________________________________________________
-//
 
-class Poller : public Actor, public Sink<TimerMsg, 2>
-{
-    TimerSource _pollInterval;
-    std::vector<Requestable *> _publishers;
-    uint32_t _idx = 0;
-    bool _connected;
-
-public:
-    Sink<bool, 2> connected;
-    Poller(Thread &t) : Actor(t), _pollInterval(t, 1000, true, "poller")
-    {
-        _pollInterval >> this;
-        connected.async(thread(), [&](const bool &b) {
-            _connected = b;
-        });
-        async(thread(), [&](const TimerMsg tm) {
-            if (_publishers.size() && _connected)
-                _publishers[_idx++ % _publishers.size()]->request();
-        });
-    };
-    void setInterval(uint32_t t)
-    {
-        _pollInterval.interval(t);
-    }
-    Poller &operator()(Requestable &rq)
-    {
-        _publishers.push_back(&rq);
-        return *this;
-    }
-};
 
 //------------------------------------------------------------------ actors and threads
 Thread mainThread("main");
@@ -80,9 +50,15 @@ TimerSource shakeTimer(mainThread, 2000, false);
 ValueFlow<bool> triacOn(false);
 #endif
 //------------------------------------------------------------------ system props
-ValueSource<std::string> systemBuild("NOT SET");
-ValueSource<std::string> systemHostname("NOT SET");
-ValueSource<bool> systemAlive = true;
+LambdaSource<std::string> systemBuild([]() {
+    return __DATE__ " " __TIME__ ;
+});
+LambdaSource<std::string> systemHostname([]() {
+    return Sys::hostname();
+});
+LambdaSource<bool> systemAlive([]() {
+    return true;
+});
 #include <FreeRTOS.h>
 LambdaSource<uint32_t> systemHeap([]() {
     return esp_get_free_heap_size();
@@ -113,6 +89,9 @@ uint32_t getMac32()
 #include <driver/uart.h>
 extern "C" void app_main(void)
 {
+    while(true) {
+    INFO("Starting limeroEsp8266 on %s heap : %d ", Sys::getProcessor(), Sys::getFreeHeap());
+}
     uart_set_baudrate(UART_NUM_0, 115200);
 #if defined(ANCHOR) || defined(TAG)
     esp_set_cpu_freq(ESP_CPU_FREQ_160M); // need for speed, DWM1000 doesn't wait !
@@ -123,15 +102,10 @@ extern "C" void app_main(void)
 #ifdef HOSTNAME
     Sys::hostname(S(HOSTNAME));
 #else
-    std::string hn;
-    string_format(hn, "ESP82-%d", getMac32() & 0xFFFF);
+    std::string hn = stringFormat( "ESP82-%d", getMac32() & 0xFFFF);
     Sys::hostname(hn.c_str());
 #endif
-    systemHostname = Sys::hostname();
-    systemBuild = __DATE__ " " __TIME__;
-    INFO("%s : %s ", Sys::hostname(), systemBuild().c_str());
 
-    INFO("Starting nanoAkka on %s heap : %d ", Sys::getProcessor(), Sys::getFreeHeap());
     ledBlue.init();
     ledRed.init();
     wifi.init();
@@ -154,13 +128,7 @@ extern "C" void app_main(void)
     poller(wifi.macAddress)(wifi.ipAddress)(wifi.ssid)(wifi.rssi);
     //------------------------------------------------------------------- console logging
 
-    TimerSource &logTimer = *(new TimerSource(mainThread, 10000, true));
-    logTimer >> ([](const TimerMsg &tm) {
-        INFO(" ovfl : %u busyPop : %u busyPush : %u threadQovfl : %u  ", stats.bufferOverflow, stats.bufferPopBusy, stats.bufferPushBusy, stats.threadQueueOverflow);
-    });
-    //   configHost == mqtt.topic<std::string>("system/host");
-    //   configFloat == mqtt.topic<float>("system/float");
-    poller(configHost)(configFloat);
+
 //------------------------------------------------------------------- DWM1000
 #ifdef TREESHAKER
     triacPin.init();
@@ -215,9 +183,9 @@ extern "C" void app_main(void)
     anchor.address >> mqtt.toTopic<uint16_t>("anchor/address");
     poller(anchor.blinks)(anchor.polls)(anchor.finals)(anchor.interruptCount);
     poller(anchor.errs)(anchor.timeouts)(anchor.distanceRef)(anchor.address);
-    poller(anchor.x)(anchor.y);
 
 #endif
     mainThread.start(); // wifi init fails if this doesn't end
     mqttThread.start();
 }
+#endif

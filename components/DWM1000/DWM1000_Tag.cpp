@@ -9,6 +9,7 @@
 #include <Log.h>
 #include <decaSpi.h>
 #include <Sys.h>
+#include <StringUtility.h>
 
 extern "C" {
 #include "deca_device_api.h"
@@ -184,8 +185,8 @@ void DWM1000_Tag::wiring()
                 std::string topic;
                 std::string message;
 
-                string_format(topic,"anchors/%d",anchors[i]._address);
-                string_format(message,"{\"x\":%d,\"y\":%d,\"distance\":%d}",
+                topic = stringFormat("anchors/%d",anchors[i]._address);
+                message = stringFormat("{\"x\":%d,\"y\":%d,\"distance\":%d}",
                               anchors[i]._x,
                               anchors[i]._y,
                               anchors[i]._distance);
@@ -324,10 +325,9 @@ void DWM1000_Tag::updateAnchors(BlinkMsg& blinkMsg)
 void DWM1000_Tag::listAnchors(std::string& output)
 {
     output.clear();
-    std::string anchor;
     for (uint32_t i = 0; i < MAX_ANCHORS; i++)
         if (anchors[i]._address != 0) {
-            string_format(anchor, "{ address=%d, x=%d , y = %d, distance = %d  } ", anchors[i]
+            std::string anchor = stringFormat( "{ address=%d, x=%d , y = %d, distance = %d  } ", anchors[i]
                           ._address, anchors[i]._x, anchors[i]._y, anchors[i]
                           ._distance);
             output += anchor;
@@ -554,7 +554,7 @@ static uint64 get_rx_timestamp_u64(void)
  *        ts  timestamp value
  *
  * @return none
- */
+ 
 static void final_msg_get_ts(const uint8 *ts_field, uint32 *ts)
 {
     int i;
@@ -563,7 +563,7 @@ static void final_msg_get_ts(const uint8 *ts_field, uint32 *ts)
         *ts += ts_field[i] << (i * 8);
     }
 }
-
+*/
 /*! ------------------------------------------------------------------------------------------------------------------
  * @fn final_msg_set_ts()
  *

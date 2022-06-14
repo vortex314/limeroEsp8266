@@ -113,8 +113,8 @@ public:
         TimerSource pulseTimer;
 
      
-    ValueSource<MqttMessage> mqttMsg;
-    ValueSource<bool> blink;
+    ValueFlow<MqttMessage> mqttMsg;
+    ValueFlow<bool> blink;
     RefSource<uint32_t> polls;
     RefSource<uint32_t> resps;
     RefSource<uint32_t> blinks;

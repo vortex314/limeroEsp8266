@@ -156,9 +156,6 @@ extern void dwt_isr();
 
 void DWM1000::init()
 {
-    volatile int32_t a;
-    a=x();
-    a=y();
     resetChip();
     spi_set_rate_low();
     dwt_setpanid(0xDECA);

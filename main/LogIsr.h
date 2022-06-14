@@ -20,7 +20,7 @@ class LogIsr: public Actor
     static LogIsr* _me;
 public:
     TimerSource logTimer;
-    Sink<std::string,20> logs;
+//    Sink<std::string> logs;
     static void log(const char* str);
     static void log(const char* file, uint32_t line, const char* fmt, ...);
     static bool _debug;

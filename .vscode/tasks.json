@@ -19,7 +19,6 @@
                 "panel": "shared"
             },
             "args": [
-                "ANCHOR1"
             ],
             "problemMatcher": {
                 "owner": "cpp",

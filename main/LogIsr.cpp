@@ -52,7 +52,7 @@ void LogIsr::init()
             char ch = _buffer.front();
             if (ch == 0)
             {
-                logger.serialLog((char *)line.c_str(), line.length());
+                logger.logf("%s",(char *)line.c_str(), line.length());
                 line.clear();
             }
             else
@@ -61,6 +61,6 @@ void LogIsr::init()
             }
         }
         if (line.length() != 0)
-            logger.serialLog((char *)line.c_str(), line.length());
+            logger.logf("%s",(char *)line.c_str(), line.length());
     });
 }

@@ -13,12 +13,10 @@
             ],
             "defines": [
                 "FREERTOS",
-                "MQTT_HOST=limero.ddns.net",
-                "MQTT_PORT=1883",
                 "ESP8266_RTOS_SDK",
-                "ANCHOR1"
+                "MAIN_TREESHAKER"
             ],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64",

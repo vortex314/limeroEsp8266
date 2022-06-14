@@ -10,6 +10,7 @@
 #include <decaSpi.h>
 #include <Config.h>
 #include <Sys.h>
+#include <StringUtility.h>
 
 extern "C" {
 
@@ -197,8 +198,7 @@ void DWM1000_Anchor::wiring()
     logTimer >> ([&](const TimerMsg& tm) {
         INFO(" int: %d to:%d blk: %d pol: %d rsp: %d fin: %d dist: %.1f delay: %d usec", _interrupts, _timeouts, _blinks, _polls, _resps, _finals, _distance, _interruptDelay);
         std::string topic="anchor/poller";
-        std::string message;
-        string_format(message,"%u:%u",_pollMsg.getSrc(),_pollMsg.getDst());
+        std::string message = stringFormat("%u:%u",_pollMsg.getSrc(),_pollMsg.getDst());
         mqttMsg.emit({topic,message});
     });
 

@@ -1,14 +1,17 @@
 PROJECT_NAME := limeroEsp8266
-DEFINEK ?= -DAAAAA=BBBBBB
 IDF_PATH =$(HOME)/esp/ESP8266_RTOS_SDK
 LIMERO = $(HOME)/workspace/limero
-EXTRA_COMPONENT_DIRS = $(LIMERO)/esp8266_rtos_sdk $(LIMERO)/limero DWM1000 $(LIMERO)/common
+EXTRA_COMPONENT_DIRS = $(LIMERO)/esp8266_rtos_sdk $(LIMERO)/limero DWM1000 $(LIMERO)/src 
+
+WIFI_P = ${WIFI_PASS}
+WIFI_S = ${WIFI_SSID}
 
 CXXFLAGS += -g -ffunction-sections -fdata-sections -fno-threadsafe-statics 
 CXXFLAGS += -std=c++11 -fno-rtti -lstdc++ -fno-exceptions 
-CXXFLAGS += -DWIFI_PASS=${PSWD} -DWIFI_SSID=${SSID} $(DEFINEK) -DESP8266_RTOS_SDK
+CXXFLAGS += -DWIFI_PASS=$(WIFI_P) -DWIFI_SSID=$(WIFI_S) -DESP8266_RTOS_SDK
 CXXFLAGS += -DMQTT_HOST="limero.ddns.net" -DMQTT_PORT=1883
-CXXFLAGS += -I $(LIMERO)/inc -I$(HOME)/workspace/ArduinoJson/src
+CXXFLAGS += -I $(LIMERO)/inc -I$(HOME)/workspace/ArduinoJson/src 
+CXXFLAGS += -DMAIN_TREESHAKER -DHOSTNAME=shaker1
 
 
 ESPBAUD=921600
@@ -18,30 +21,6 @@ ESPPORT = $(SERIAL_PORT)
 SERIAL_BAUD = 115200
 
 include $(IDF_PATH)/make/project.mk
-
-TAG1 :
-	touch main/main.cpp
-	make DEFINEK=" -DTAG -DHOSTNAME=tag1"
-
-ANCHOR1 :
-	touch main/main.cpp
-	make DEFINEK=" -DANCHOR=AAA001 -DHOSTNAME=anchor1"
-ANCHOR2 :
-	touch main/main.cpp
-	make DEFINEK=" -DANCHOR=AAA002 -DHOSTNAME=anchor2"
-ANCHOR3 :
-	touch main/main.cpp
-	make DEFINEK=" -DANCHOR=AAA003 -DHOSTNAME=anchor3"
-ANCHOR4 :
-	touch main/main.cpp
-	make DEFINEK=" -DANCHOR=AAA004 -DHOSTNAME=anchor4"
-ANCHOR5 :
-	touch main/main.cpp
-	make DEFINEK=" -DANCHOR=AAA005 -DHOSTNAME=anchor5"
-
-TREESHAKER:
-	touch main/main.cpp
-	make DEFINEK=" -DTREESHAKER -DHOSTNAME=treeshaker"
 
 term:
 	rm -f $(TTY)_minicom.log
